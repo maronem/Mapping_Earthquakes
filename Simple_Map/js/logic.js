@@ -5,7 +5,7 @@ console.log("working");
 
 // Create the map object with a center and zoom level
     //"mapid" references the id tag in <div> of html file
-let map = L.map("mapid").setView([34.0522, -118.2437], 14);
+let map = L.map("mapid").setView([39.0119, -98.4842], 4);
 
 // ALT METHOD - MULTIPLE TILE LAYERS
 // Create the map object with a center and zoom level.
@@ -16,16 +16,33 @@ let map = L.map("mapid").setView([34.0522, -118.2437], 14);
     // zoom: 4
   // });
 
-  // Add marker to map for LA, California
-  var marker = L.marker([34.0522, -118.2437]).addTo(map);
+// An array containing each city's location, state, and population.
+// moved to cities.js -> get data from cities.js
+let cityData = cities;
+
+// iterate through the cities array and create on emarker for each city
+//for (let i=0; i < cities.length; i++)
+cityData.forEach(function(city) {
+  console.log(city);
+  L.circleMarker(city.location, {
+    //adjust population size to decrease circle size
+    radius: city.population/200000,
+    fillColor: "orange",
+    color: "orange",
+    fillOpacity: 0.1,
+  })
+  // .toLocaleString() formats number as string with "," seperator
+  .bindPopup("<h2>" + city.city + ", " + city.state + "</h2> <hr> <h3>Population: " + city.population.toLocaleString() + "</h3>")
+  .addTo(map);
+});
 
   // Add a circle marker to map for LA, California
-  L.circleMarker([34.0522, -118.2437], {
-    radius: 300,
-    fillColor: "yellow",
-    color: "black",
-    fillOpacity: .1
-  }).addTo(map);
+  //L.circleMarker([34.0522, -118.2437], {
+    //radius: 300,
+    //fillColor: "yellow",
+    //color: "black",
+    //fillOpacity: .1
+  //}).addTo(map);
 
 // We create the tile layer that will be the background of our map.
 let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
