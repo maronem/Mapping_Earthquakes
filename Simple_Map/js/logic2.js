@@ -95,6 +95,14 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
   }).addTo(map);
 });
 
+// getRadius() function for stying info
+function getRadius(magnitude) {
+    if (magnitude === 0) {
+      return 1;
+    }
+    return magnitude*4;
+  }
+
 // This function returns the style data for each of the earthquakes we plot on the map.
 // We pass the magnitude of the earthquake into a function to calculate the radius.
 function styleInfo(feature) {
@@ -102,19 +110,11 @@ function styleInfo(feature) {
     opacity: 1,
     fillOpacity: 1,
     fillColor: "#ffae42",
-    coor: "#000000",
-    radius: getRadius(),
+    color: "#000000",
+    radius: getRadius(feature.properties.mag),
     stroke: true,
     weight: 0.5
   };
-}
-
-// getRadius() function for stying info
-function getRadius(magnitude) {
-  if (magnitude === 0) {
-    return 1;
-  }
-  return magnitude * 4;
 }
 
 // Create a style for GeoJSON lines.
