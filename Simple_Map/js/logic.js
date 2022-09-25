@@ -3,22 +3,22 @@
 // Add console.log to check to see if our code is working.
 console.log("working");
 
-// Create the map object with a center and zoom level
+// Create the map object with a center and zoom level - USED FOR SINGLE MAP
     //"mapid" references the id tag in <div> of html file
-let map = L.map("mapid").setView([37.6213, -122.3790], 5);
+//let map = L.map("mapid").setView([30, 30], 2);
 
 // Coordinates for each point to be used in the line.
-let line = [
-  [33.9416, -118.4085],
-  [37.6213, -122.3790],
-  [40.7899, -111.9791],
-  [47.4502, -122.3088]
-];
+//let line = [
+  //[33.9416, -118.4085],
+  //[37.6213, -122.3790],
+  //[40.7899, -111.9791],
+  //[47.4502, -122.3088]
+//];
 
 // Create a polyline using the line coordinates and make the line red
-L.polyline(line, {
-  color: "yellow"
-}).addTo(map);
+//L.polyline(line, {/
+  //color: "yellow"
+//}).addTo(map);
 
 // ALT METHOD - MULTIPLE TILE LAYERS
 // Create the map object with a center and zoom level.
@@ -31,23 +31,72 @@ L.polyline(line, {
 
 // An array containing each city's location, state, and population.
 // moved to cities.js -> get data from cities.js
-let cityData = cities;
+//let cityData = cities;
+
+// Add GeoJSON data.
+//let sanFranAirport =
+//{"type":"FeatureCollection","features":[{
+    //"type":"Feature",
+    //"properties":{
+        //"id":"3469",
+        //"name":"San Francisco International Airport",
+        //"city":"San Francisco",
+        //"country":"United States",
+        ///"faa":"SFO",
+        //"icao":"KSFO",
+        //"alt":"13",
+        //"tz-offset":"-8",
+       //"dst":"A",
+        //"tz":"America/Los_Angeles"},
+        //"geometry":{
+            //"type":"Point",
+            // The L.geoJSON()layer reverses the coordinates to plot them on the map.
+            //"coordinates":[-122.375,37.61899948120117]}}
+//]};
+
+// Accessing the airport GeoJSON URL
+let airportData = "https://raw.githubusercontent.com/maronem/Mapping_Earthquakes/main/majorAirports.json"
+
+// Grabbing our GeoJSON data.
+d3.json(airportData).then(function(data) {
+  console.log(data);
+// Creating a GeoJSON layer with the retrieved data.
+L.geoJSON(data).addTo(map);
+});
+
+
+// Grabbing our GeoJSON data. USING pointToLayer
+//L.geoJSON(sanFranAirport, {
+  //pointToLayer: function(feature, latlng) {
+    //console.log(feature);
+    //return L.marker(latlng)
+    //.bindPopup("<h2>" + feature.properties.city + "</h2>")
+  //}
+//}).addTo(map);
+
+// Grabbign out GeoJSON data USING onEachFeature
+//L.geoJson(sanFranAirport, {
+  //onEachFeature: function(feature, layer) {
+    //console.log(layer);
+    //layer.bindPopup("<h3>Airport code: " + feature.properties.faa + "<hr>" + "Airport name: " + feature.properties.name + "</h3>");
+ //}
+//}).addTo(map);
 
 // iterate through the cities array and create on emarker for each city
 //for (let i=0; i < cities.length; i++)
-cityData.forEach(function(city) {
-  console.log(city);
-  L.circleMarker(city.location, {
+//cityData.forEach(function(city) {
+  //console.log(city);
+  //L.circleMarker(city.location, {
     //adjust population size to decrease circle size
-    radius: city.population/200000,
-    fillColor: "orange",
-    color: "orange",
-    fillOpacity: 0.1,
-  })
+    //radius: city.population/200000,
+    //fillColor: "orange",
+    //color: "orange",
+    //fillOpacity: 0.1,
+  //})
   // .toLocaleString() formats number as string with "," seperator
-  .bindPopup("<h2>" + city.city + ", " + city.state + "</h2> <hr> <h3>Population: " + city.population.toLocaleString() + "</h3>")
-  .addTo(map);
-});
+  //.bindPopup("<h2>" + city.city + ", " + city.state + "</h2> <hr> <h3>Population: " + city.population.toLocaleString() + "</h3>")
+  //.addTo(map);
+//});
 
   // Add a circle marker to map for LA, California
   //L.circleMarker([34.0522, -118.2437], {
@@ -58,13 +107,36 @@ cityData.forEach(function(city) {
   //}).addTo(map);
 
 // We create the tile layer that will be the background of our map.
-let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
-    id: 'satellite-streets-v11',
+    id: 'outdoors-v11',
     tileSize: 512,
     zoomOffset: -1,
     accessToken: API_KEY
 });
-// Then we add our 'graymap' tile layer to the map.
-streets.addTo(map);
+
+let dark = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'dark-v10',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: API_KEY
+});
+
+// Create a base layer that holds both maps.
+let baseMaps = {
+  Street: streets,
+  Dark: dark
+};
+
+// Create the map object with center, zoom level, default layer
+let map = L.map("mapid", {
+  center:[30,30],
+  zoom: 2,
+  layers: [streets]
+});
+
+// Pass map layers into layer control and add it to the map
+L.control.layers(baseMaps).addTo(map);
